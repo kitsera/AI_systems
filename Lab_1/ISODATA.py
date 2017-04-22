@@ -55,6 +55,7 @@ class ISODATA:
                 Utils.filter_cluster_dists(self.field)
                 Utils.combine_clusters(self.field)
 
+
     def get_field(self):
         return self.field
 
