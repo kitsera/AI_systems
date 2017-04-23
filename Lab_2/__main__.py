@@ -1,5 +1,6 @@
 import queue
 import time
+from collections import deque
 
 class Position:
     def __init__(self, position):
@@ -16,7 +17,7 @@ class Position:
 
     def append_child(self, child):
         self.childs.append(child)
-        child.set_parent(self.position)
+        child.set_parent(self)
         child.set_depth(self.depth+1)
 
     def get_childs(self):
@@ -45,11 +46,11 @@ class BFS:
         self.states = {}
 
     def algo_iter(self):
-        queue_i = queue.Queue()
-        queue_i.put(Position(self.startPos))
-        states = []
-        while not queue_i.empty():
-            self.position = queue_i.get()
+        queue_i = deque()
+        queue_i.append(Position(self.startPos))
+        states = deque()
+        while len(queue_i) != 0:
+            self.position = queue_i.popleft()
             states.append(self.position.get_position())
 
             if self.position.get_position() == self.goalPos:
@@ -60,25 +61,25 @@ class BFS:
                 print("Час для знаходження: " + str(time.time()-time_init))
                 return True
 
-            self.zero = self.find_zero()
-            if self.move_left() != 0 and self.move_left():
+            self.zero = self.position.get_position().index(0)
+            if self.move_left() != None and self.move_left() not in states:
                 left_child = Position(self.move_left())
                 self.position.append_child(left_child)
 
-            if self.move_down() != 0 and self.move_down():
+            if self.move_down() != None and self.move_down() not in states:
                 down_child = Position(self.move_down())
                 self.position.append_child(down_child)
 
-            if self.move_right() != 0 and self.move_right():
+            if self.move_right() != None and self.move_right() not in states:
                 right_child = Position(self.move_right())
                 self.position.append_child(right_child)
 
-            if self.move_up() != 0 and self.move_up():
+            if self.move_up() != None and self.move_up() not in states:
                 up_child = Position(self.move_up())
                 self.position.append_child(up_child)
+
             for child in self.position.get_childs():
-                if child.get_position() not in states:
-                    queue_i.put(child)
+                    queue_i.append(child)
                     states.append(child.get_position())
 
 
@@ -88,8 +89,7 @@ class BFS:
             new_pos[self.zero] = self.position.get_position()[self.zero - 3]
             new_pos[self.zero - 3] = 0
             return new_pos
-        else:
-            return 0
+
 
     def move_right(self):
         if self.zero % 3 != 2:
@@ -97,8 +97,6 @@ class BFS:
             new_pos[self.zero] = self.position.get_position()[self.zero + 1]
             new_pos[self.zero + 1] = 0
             return new_pos
-        else:
-            return 0
 
     def move_down(self):
         if self.zero < 6:
@@ -106,8 +104,6 @@ class BFS:
             new_pos[self.zero] = self.position.get_position()[self.zero + 3]
             new_pos[self.zero + 3] = 0
             return new_pos
-        else:
-            return 0
 
     def move_left(self):
         if self.zero % 3 != 0:
@@ -115,8 +111,6 @@ class BFS:
             new_pos[self.zero] = self.position.get_position()[self.zero - 1]
             new_pos[self.zero - 1] = 0
             return new_pos
-        else:
-            return 0
 
     def find_zero(self):
         return self.position.get_position().index(0)
@@ -126,6 +120,6 @@ init_pos = [4, 1, 8, 6, 0, 5, 7, 3, 2]
 mp = [1, 2, 3, 0, 4, 5, 6, 7, 8]
 goal_pos = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
-bfs = BFS(init_pos, goal_pos)
+bfs = BFS(mp, goal_pos)
 time_init = time.time()
 bfs.algo_iter()
